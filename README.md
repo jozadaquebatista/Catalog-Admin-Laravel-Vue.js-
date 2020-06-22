@@ -1,4 +1,4 @@
-# Catalog Admin (Laravel + Vue.js)
+# Product Admin (Laravel + Vue.js)
 Uma aplicação para um teste
 
 ## Imagens do resultado final
