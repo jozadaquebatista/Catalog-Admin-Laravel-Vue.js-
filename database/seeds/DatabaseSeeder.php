@@ -15,15 +15,15 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         User::create([
-            'name' => 'Senhor Kaioh',
-            'email' => 'admin@dbzmail.com',
+            'name' => 'Seara Fiari',
+            'email' => 'admin@mail.com',
             'password' => bcrypt('456789'),
             'admin' => true
         ]);
 
         User::create([
-            'name' => 'Son Goku',
-            'email' => 'user@dbzmail.com',
+            'name' => 'Mara Paipa',
+            'email' => 'user@mail.com',
             'password' => bcrypt('456789'),
             'admin' => false
         ]);

@@ -17,7 +17,6 @@ import Croppa from 'vue-croppa'
 import 'vuetify/dist/vuetify.min.css'
 
 import App from './components/App'
-import ProductForm from './components/ProductForm'
 import Form from './components/Products/Form'
 import ProductsHome from './components/Products/Home'
 

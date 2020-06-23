@@ -10,7 +10,7 @@
                   <v-img aspect-ratio="1">
                     <croppa class="cropper"
                         v-model="croppa"
-                        placeholder="Clique para escolher ou arraste"
+                        placeholder="Clique para escolher a imagem ou arraste alguma"
                         canvas-color="transparent"
                         :zoom-speed="20"
                         :width="500"
@@ -119,8 +119,8 @@
                             'content-type': 'multipart/form-data'
                         }
                     }).then(response => {
-                        console.log(response.response.status);
-                        this.$router.push({name: 'products.edit', params: { id: id }});
+                        console.log(response.status);
+                        this.$router.push({path: '/products'});
                     }).catch(error => {
                         console.error('Não foi possível salvar o produto', error.toString());
                     });

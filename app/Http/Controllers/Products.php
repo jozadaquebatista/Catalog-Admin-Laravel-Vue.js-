@@ -98,9 +98,11 @@ class Products extends Controller
 
     public function update($id)
     {
+        $this->productInfo->id = $id;
+
         if($this->hasPermission)
         {
-            $savePicture = true;
+            $savePicture = $this->request->has('image');
 
             try {
                 $exists = Product::find($id);
@@ -112,9 +114,9 @@ class Products extends Controller
 
                 Product::find($id)->update($this->payload);
 
-                $this->productInfo->id = $id;
+                $productHasImages = Product::find($id)->pictures->count() > 0;
 
-                if(Product::find($id)->pictures->count() > 0)
+                if($savePicture && $productHasImages)
                 {
                     $this->pictureInfo->id = Product::find($id)->pictures[0]->id;
 
@@ -137,7 +139,6 @@ class Products extends Controller
     {
         if($this->hasPermission)
         {
-            // Soft Deleting
             try {
 
                 Product::find($id)->delete();

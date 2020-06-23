@@ -74,7 +74,7 @@ export default {
         }),
         signOut() {
             this.logout().then(() => {
-                console.warn('saiu');
+                console.log('saiu');
             });
         }
     }
