@@ -29,14 +29,24 @@ Para compilar os componentes, basta executar o comando abaixo em algum terminal:
 ## Resultado Final
 
 ### Login
-<img src="https://i.imgur.com/l7X43LM.png" width=1000 border="1px solid #000" />
+<kbd>
+    
+![Login Screen](https://i.imgur.com/l7X43LM.png)
 
+</kbd>
 ---------
 
 ### Tela inicial
-<img src="https://i.imgur.com/KiqBpO9.png" width=1000 />
+<kbd>
 
+![Login Screen](https://i.imgur.com/KiqBpO9.png)
+
+</kbd>
 ---------
 
 ### Cadastro de Produto
-<img src="https://i.imgur.com/mDcaWzT.png" width=800 />
+<kbd>
+
+![Login Screen](https://i.imgur.com/mDcaWzT.png)
+
+</kbd>
