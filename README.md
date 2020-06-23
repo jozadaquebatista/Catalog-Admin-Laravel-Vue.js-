@@ -2,7 +2,14 @@
 Uma aplicação para um teste FullStack
 
 ### Objetivo
-Desenvolver uma aplicação para gestão de produtos, que deverá conter visualização dos produtos, adição de novos produtos com possibilidade de adição de fotografias, edição de produto, definição do o status de um produto(pendente, análise, aprovado, reprovado), autenticação de administrador, usuário normal e para as chamadas de API, níveis de permissão(autorização), filtragem de produtos (front-end + back-end)
+Desenvolver uma aplicação para gestão de produtos, que deverá conter:
+- visualização dos produtos
+- adição de novos produtos com possibilidade de adição de fotografias
+- edição de produto
+- definição do o status de um produto(pendente, análise, aprovado, reprovado)
+- autenticação para administrador, usuário normal e para as chamadas de API
+- níveis de permissão(autorização)
+- filtragem de produtos (front-end + back-end)
 
 ### Nesse projeto foi utilizado
 - [x] **Sqlite** - Utilizei para tornar mais simples para avaliação
