@@ -1,18 +1,18 @@
 # Product Admin (Laravel + Vue.js)
-Uma aplicação para um teste FullStack
+An Fullstack Developer Aplication Test
 
-### Objetivo
-Desenvolver uma aplicação para gestão de produtos, que deverá conter:
-- visualização dos produtos
-- adição de novos produtos com possibilidade de adição de fotografias
-- edição de produto
-- definição do o status de um produto(pendente, análise, aprovado, reprovado)
-- autenticação para administrador, usuário normal e para as chamadas de API
-- níveis de permissão(autorização)
-- filtragem de produtos (front-end + back-end)
+### What's the Goal
+Develop an product adminstration tool, that should contain:
+- product's visualization
+- option to add a new product
+- option to edit a product
+- product status definition(pending, reviewing, aproved, reproved)
+- API, admin and normal user authentication
+- permission level(authorization)
+- back-end and front-end product filtering
 
-### Nesse projeto foi utilizado
-- [x] **Sqlite** - Utilizei para tornar mais simples para avaliação
+### This project is done with
+- [x] **Sqlite** - Just for testing
 - [x] **PHP 7.4**
 - [x] **Laravel Framework 7**
 - [x] **Vue.js 2.0**
@@ -22,18 +22,18 @@ Desenvolver uma aplicação para gestão de produtos, que deverá conter:
 - [x] **Axios**
 - [x] **Croppa**
 
-### Executar Servidor
-Basta executar os comandos a baixo em ordem
-1) **php artisan migrate** = realiza as migrações para o database.sqlite, localizado em datatabase/database.sqlite
-2) **php artisan db:seed** = pré popula o banco de dados com informações de produtos "**fakes**"
-3) **php artisan serve** = inicia o servidor
+### How to Start the Server
+You just need to execute the following commands:
+1) **php artisan migrate** = do all migrations to the database.sqlite file in database/database.sqlite
+2) **php artisan db:seed** = pre loading of products information "**fake info**"
+3) **php artisan serve** = starts the server
 
-### Compilação dos Componentes Vue.js
-Para compilar os componentes, basta executar o comando abaixo em algum terminal::
-1) **npm run watch** = compila os arquivos componentes do vue.js e faz um bundle de tudo
+### How to compile Vue.js components for testing
+To compile the components you just should write the bellow instruction on a command line:
+1) **npm run watch** = compile and bundle vue.js files
 
 
-## Resultado Final
+## Final Result
 
 ### Login
 <kbd>
@@ -43,17 +43,17 @@ Para compilar os componentes, basta executar o comando abaixo em algum terminal:
 </kbd>
 ---------
 
-### Tela inicial
+### Home Screen
 <kbd>
 
-![Listagem dos Produtos](https://raw.githubusercontent.com/jozadaquebatista/Catalog-Admin-Laravel-Vue.js-/master/cover/screen2.PNG)
+![Home Screen](https://raw.githubusercontent.com/jozadaquebatista/Catalog-Admin-Laravel-Vue.js-/master/cover/screen2.PNG)
 
 </kbd>
 ---------
 
-### Cadastro de Produto
+### Product Register
 <kbd>
 
-![Cadastro de Produto](https://raw.githubusercontent.com/jozadaquebatista/Catalog-Admin-Laravel-Vue.js-/master/cover/screen3.PNG)
+![Product Register](https://raw.githubusercontent.com/jozadaquebatista/Catalog-Admin-Laravel-Vue.js-/master/cover/screen3.PNG)
 
 </kbd>
