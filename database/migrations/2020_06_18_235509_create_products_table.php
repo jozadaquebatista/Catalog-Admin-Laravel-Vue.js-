@@ -18,7 +18,8 @@ class CreateProductsTable extends Migration
             $table->string('name',150);
             $table->tinyInteger('status')->default(0);
             $table->softDeletes();
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
             /*
             $table->string('description');
             $table->string('price');

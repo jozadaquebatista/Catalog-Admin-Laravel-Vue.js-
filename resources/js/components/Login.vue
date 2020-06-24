@@ -59,7 +59,6 @@
 
                 this.signIn(this.user).then(() => {
                     this.habilitado = true;
-                    this.$router.push({ path: '/products' });
                 }).catch((e) => {
                     this.habilitado = true;
                     alert('authentication failed!');

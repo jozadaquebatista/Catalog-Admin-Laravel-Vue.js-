@@ -2016,27 +2016,39 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
+    return {
+      avatar: "https://randomuser.me/api/portraits/women/".concat(Math.round(Math.random() * 100), ".jpg"),
+      menu: []
+    };
+  },
+  beforeMount: function beforeMount() {
     var _this = this;
 
-    return {
-      menu: [{
-        title: 'Home',
-        icon: 'mdi-home-city',
-        navigate: function navigate() {
-          return _this.$router.push({
-            path: '/products'
-          });
-        }
-      }, {
-        title: 'Novo Produto',
-        icon: 'mdi-folder-plus',
-        navigate: function navigate() {
-          return _this.$router.push({
-            path: '/products/form'
-          });
-        }
-      }]
-    };
+    if (this.authenticated) this.$router.push({
+      path: '/products'
+    }); // menu build
+
+    [{
+      title: 'Home',
+      icon: 'mdi-home-city',
+      navigate: function navigate() {
+        return _this.$router.push({
+          path: '/products'
+        });
+      },
+      show: true
+    }, {
+      title: 'Novo Produto',
+      icon: 'mdi-folder-plus',
+      navigate: function navigate() {
+        return _this.$router.push({
+          path: '/products/form'
+        });
+      },
+      show: !this.user.admin
+    }].forEach(function (item) {
+      if (item.show) _this.menu.push(item);
+    });
   },
   computed: _objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapGetters"])({
     authenticated: 'authenticated',
@@ -2129,10 +2141,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.habilitado = false;
       this.signIn(this.user).then(function () {
         _this.habilitado = true;
-
-        _this.$router.push({
-          path: '/products'
-        });
       })["catch"](function (e) {
         _this.habilitado = true;
         alert('authentication failed!');
@@ -2717,16 +2725,11 @@ __webpack_require__.r(__webpack_exports__);
       this.croppa.generateBlob(function (blob) {
         _this2.form.endpoint = "/api/v1/products".concat(_this2.product.id ? "/".concat(_this2.product.id) : '');
         var payload = new FormData();
-        payload.append('_method', 'PUT');
+        var method = _this2.product.id ? 'put' : 'post';
+        payload.append('_method', method);
         payload.append('image', blob);
         payload.append('name', _this2.product.name);
-        /*
-        payload.append('price', this.price);
-        payload.append('category', this.product.category);
-        payload.append('info', this.product.info);
-        */
-
-        axios[_this2.form.method](_this2.form.endpoint, payload, {
+        axios[method](_this2.form.endpoint, payload, {
           headers: {
             'content-type': 'multipart/form-data'
           }
@@ -2848,6 +2851,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2878,9 +2887,65 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         payload: {}
       },
       search: '',
-      products: [],
-      page: 1,
-      itemsPerPage: 8
+      timer: null,
+      filteredProductList: [],
+      products: [{
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }],
+      browser: {
+        page: 1,
+        itemsPerPage: 10,
+        lastPage: 1
+      },
+      server: {
+        page: 1,
+        lastPage: 1,
+        perPage: 1,
+        total: 1,
+        from: 1,
+        to: 1,
+        firstPageUrl: '',
+        lastPageUrl: '',
+        nextPageUrl: ''
+      }
     };
   },
   mounted: function mounted() {
@@ -2890,20 +2955,112 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     authenticated: 'authenticated',
     user: 'user'
   })), {}, {
-    filteredList: function filteredList() {
-      var _this = this;
-
-      return this.search.length < 1 ? this.products : this.products.filter(function (item) {
-        return item.name.indexOf(_this.search) > -1;
-      });
+    browserProductFiltered: {
+      get: function get() {
+        var pagePiece = this.browser.page * this.browser.itemsPerPage;
+        var userSearched = this.search.length > 0;
+        var searchEmpty = this.products.slice(pagePiece - this.browser.itemsPerPage, pagePiece);
+        if (userSearched) return this.filteredProductList;
+        return searchEmpty;
+      },
+      set: function set(value) {
+        this.filteredProductList = value;
+      }
+    },
+    browserLastPage: function browserLastPage() {
+      return Math.ceil(this.products.length / this.browser.itemsPerPage);
     }
   }),
   methods: {
+    loading: function loading() {
+      this.filteredProductList = [{
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }, {
+        name: 'aguarde...',
+        status: 1,
+        pictures: []
+      }];
+    },
+    serverProductSearch: function serverProductSearch() {
+      var _this = this;
+
+      clearTimeout(this.timer);
+      this.loading();
+      this.timer = setTimeout(function () {
+        _this.filteredProductList = _this.products.filter(function (item) {
+          return item.name.indexOf(_this.search) > -1;
+        });
+
+        var exception = _this.filteredProductList.map(function (item) {
+          return item.id;
+        }).filter(function (id) {
+          return typeof id !== "undefined";
+        });
+
+        var encodedParams = ["search=".concat(encodeURIComponent(_this.search)), "except=".concat(encodeURIComponent(exception))].join('&');
+        axios.get("/api/v1/products?".concat(encodedParams)).then(function (response) {
+          _this.products = _this.products.concat(response.data.data).sort(function (a, b) {
+            return a.id < b.id ? -1 : 1;
+          }); // setting browser pagination configuration with a computed property
+
+          _this.browser.lastPage = _this.filteredProductList.length;
+          console.log('requesting more pages...');
+        })["catch"](function (error) {
+          console.error(error);
+        });
+      }, 1000);
+    },
     show: function show() {
       var _this2 = this;
 
-      axios.get('api/v1/products').then(function (response) {
-        _this2.products = response.data.data;
+      axios.get('/api/v1/products').then(function (response) {
+        _this2.products = response.data.data; // setting server pagination configuration
+
+        _this2.server.page = response.data.current_page;
+        _this2.server.lastPage = response.data.last_page;
+        _this2.server.perPage = response.data.per_page;
+        _this2.server.total = response.data.total;
+        _this2.server.from = response.data.from;
+        _this2.server.to = response.data.to;
+        _this2.server.firstPageUrl = response.data.first_page_url;
+        _this2.server.lastPageUrl = response.data.last_page_url;
+        _this2.server.nextPageUrl = response.data.nex_page_url; // setting browser pagination configuration with a computed property
+
+        _this2.browser.lastPage = _this2.browserLastPage;
         console.warn(response);
       })["catch"](function (error) {
         console.error(error);
@@ -2920,7 +3077,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     remove: function remove(id) {
       var _this3 = this;
 
-      axios["delete"]("api/v1/products/".concat(id)).then(function (response) {
+      axios["delete"]("/api/v1/products/".concat(id)).then(function (response) {
         console.log(response.data);
 
         _this3.show();
@@ -2928,8 +3085,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         console.error(error);
       });
     },
-    productStatus: function productStatus(payload) {
+    next: function next() {
       var _this4 = this;
+
+      if (this.browser.page === this.browser.lastPage - 1) {
+        axios.get("/api/v1/products?page=".concat(++this.server.page)).then(function (response) {
+          _this4.products = _this4.products.concat(response.data.data); // setting browser pagination configuration
+
+          _this4.browser.lastPage = _this4.browserLastPage;
+          console.log('requesting more pages...');
+        })["catch"](function (error) {
+          console.error(error);
+        });
+      }
+    },
+    productStatus: function productStatus(payload) {
+      var _this5 = this;
 
       this.form.endpoint = "/api/v1/products".concat(payload.id ? "/".concat(payload.id) : '');
 
@@ -2958,8 +3129,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.products = this.products.map(function (item) {
           if (Number(item.id) === Number(payload.id)) {
             item.status = 1;
-            _this4.form.payload.status = item.status;
-            _this4.form.payload.name = payload.name;
+            _this5.form.payload.status = item.status;
+            _this5.form.payload.name = payload.name;
           }
 
           return item;
@@ -7438,7 +7609,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n* {\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n}\n", ""]);
+exports.push([module.i, "\n* { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;\n}\n", ""]);
 
 // exports
 
@@ -42343,19 +42514,14 @@ var render = function() {
                     { attrs: { "two-line": "" } },
                     [
                       _c("v-list-item-avatar", [
-                        _c("img", {
-                          attrs: {
-                            src:
-                              "https://randomuser.me/api/portraits/women/82.jpg"
-                          }
-                        })
+                        _c("img", { attrs: { src: _vm.avatar } })
                       ]),
                       _vm._v(" "),
                       _c(
                         "v-list-item-content",
                         [
                           _c("v-list-item-title", [
-                            _vm._v(_vm._s(_vm.user.name))
+                            _vm._v("Olá, " + _vm._s(_vm.user.name) + "!")
                           ]),
                           _vm._v(" "),
                           _c("v-list-item-subtitle", [
@@ -43294,7 +43460,7 @@ var render = function() {
                       [
                         _c("v-text-field", {
                           attrs: {
-                            counter: 10,
+                            counter: 150,
                             label: "Nome do Produto",
                             required: ""
                           },
@@ -43368,12 +43534,13 @@ var render = function() {
             [
               _c("v-text-field", {
                 attrs: {
-                  counter: 50,
+                  counter: 100,
                   label: "Digite para Pesquisar",
                   "prepend-inner-icon": "mdi-magnify",
                   solo: "",
                   required: ""
                 },
+                on: { input: _vm.serverProductSearch },
                 model: {
                   value: _vm.search,
                   callback: function($$v) {
@@ -43389,231 +43556,326 @@ var render = function() {
                   _c(
                     "v-card-text",
                     [
-                      _c("v-simple-table", {
-                        scopedSlots: _vm._u([
-                          {
-                            key: "default",
-                            fn: function() {
-                              return [
-                                _c("thead", [
-                                  _c("tr", [
-                                    _c("th", [_vm._v("Imagem")]),
-                                    _vm._v(" "),
-                                    _c("th", [_vm._v("Produto")]),
-                                    _vm._v(" "),
-                                    _c("th", [_vm._v("Avaliação")]),
-                                    _vm._v(" "),
-                                    _c("th", [_vm._v("Status - Atual")]),
-                                    _vm._v(" "),
-                                    _c("th", [_vm._v("Ações")])
-                                  ])
-                                ]),
-                                _vm._v(" "),
-                                _c(
-                                  "tbody",
-                                  _vm._l(_vm.filteredList, function(product) {
-                                    return _c("tr", [
-                                      _c(
-                                        "td",
-                                        [
-                                          _c(
-                                            "v-icon",
-                                            {
-                                              attrs: {
-                                                color: product.pictures.length
-                                                  ? "blue-grey darken-2"
-                                                  : "pink accent-3"
-                                              }
-                                            },
-                                            [
-                                              _vm._v(
-                                                _vm._s(
-                                                  product.pictures.length > 0
-                                                    ? "mdi-image"
-                                                    : "mdi-image-off"
-                                                )
-                                              )
-                                            ]
-                                          )
-                                        ],
-                                        1
-                                      ),
-                                      _vm._v(" "),
-                                      _c("td", [
-                                        _vm._v(
-                                          "\n                    " +
-                                            _vm._s(product.name) +
-                                            "\n                  "
-                                        )
+                      _vm.browserProductFiltered.length
+                        ? _c("v-simple-table", {
+                            scopedSlots: _vm._u(
+                              [
+                                {
+                                  key: "default",
+                                  fn: function() {
+                                    return [
+                                      _c("thead", [
+                                        _c("tr", [
+                                          _c("th", [_vm._v("Imagem")]),
+                                          _vm._v(" "),
+                                          _c("th", [_vm._v("Produto")]),
+                                          _vm._v(" "),
+                                          _c("th", [_vm._v("Avaliação")]),
+                                          _vm._v(" "),
+                                          _c("th", [_vm._v("Status")]),
+                                          _vm._v(" "),
+                                          _c("th")
+                                        ])
                                       ]),
                                       _vm._v(" "),
-                                      Number(_vm.user.admin)
-                                        ? _c(
-                                            "td",
-                                            [
+                                      _c(
+                                        "tbody",
+                                        _vm._l(
+                                          _vm.browserProductFiltered,
+                                          function(product) {
+                                            return _c("tr", [
                                               _c(
-                                                "v-radio-group",
-                                                {
-                                                  attrs: { row: "" },
-                                                  on: {
-                                                    change: function($event) {
-                                                      return _vm.productStatus(
-                                                        product
-                                                      )
-                                                    }
-                                                  },
-                                                  model: {
-                                                    value: product.status,
-                                                    callback: function($$v) {
-                                                      _vm.$set(
-                                                        product,
-                                                        "status",
-                                                        $$v
-                                                      )
-                                                    },
-                                                    expression: "product.status"
-                                                  }
-                                                },
+                                                "td",
                                                 [
-                                                  _c("v-radio", {
-                                                    attrs: {
-                                                      label: "Aprovar",
-                                                      value: "2"
-                                                    }
-                                                  }),
+                                                  _c(
+                                                    "v-btn",
+                                                    {
+                                                      staticClass: "ma-2",
+                                                      attrs: {
+                                                        tile: "",
+                                                        large: "",
+                                                        color:
+                                                          _vm.status[
+                                                            Number(
+                                                              product.status
+                                                            )
+                                                          ].color,
+                                                        icon: ""
+                                                      }
+                                                    },
+                                                    [
+                                                      _c(
+                                                        "v-icon",
+                                                        {
+                                                          attrs: {
+                                                            color: product
+                                                              .pictures.length
+                                                              ? "blue-grey darken-2"
+                                                              : "blue-grey lighten-4"
+                                                          }
+                                                        },
+                                                        [
+                                                          _vm._v(
+                                                            _vm._s(
+                                                              product.pictures
+                                                                .length > 0
+                                                                ? "mdi-image"
+                                                                : "mdi-image-off"
+                                                            )
+                                                          )
+                                                        ]
+                                                      )
+                                                    ],
+                                                    1
+                                                  )
+                                                ],
+                                                1
+                                              ),
+                                              _vm._v(" "),
+                                              _c("td", [
+                                                _vm._v(
+                                                  "\n                    " +
+                                                    _vm._s(product.name) +
+                                                    "\n                  "
+                                                )
+                                              ]),
+                                              _vm._v(" "),
+                                              Number(_vm.user.admin)
+                                                ? _c(
+                                                    "td",
+                                                    [
+                                                      _c(
+                                                        "v-radio-group",
+                                                        {
+                                                          attrs: { row: "" },
+                                                          on: {
+                                                            change: function(
+                                                              $event
+                                                            ) {
+                                                              return _vm.productStatus(
+                                                                product
+                                                              )
+                                                            }
+                                                          },
+                                                          model: {
+                                                            value:
+                                                              product.status,
+                                                            callback: function(
+                                                              $$v
+                                                            ) {
+                                                              _vm.$set(
+                                                                product,
+                                                                "status",
+                                                                $$v
+                                                              )
+                                                            },
+                                                            expression:
+                                                              "product.status"
+                                                          }
+                                                        },
+                                                        [
+                                                          _c("v-radio", {
+                                                            attrs: {
+                                                              label: "Aprovar",
+                                                              value: "2"
+                                                            }
+                                                          }),
+                                                          _vm._v(" "),
+                                                          _c("v-radio", {
+                                                            attrs: {
+                                                              label: "Reprovar",
+                                                              value: "3"
+                                                            }
+                                                          })
+                                                        ],
+                                                        1
+                                                      )
+                                                    ],
+                                                    1
+                                                  )
+                                                : _c(
+                                                    "td",
+                                                    [
+                                                      Number(product.status) ===
+                                                      0
+                                                        ? _c("v-switch", {
+                                                            attrs: {
+                                                              value: "0"
+                                                            },
+                                                            on: {
+                                                              change: function(
+                                                                $event
+                                                              ) {
+                                                                return _vm.productStatus(
+                                                                  product
+                                                                )
+                                                              }
+                                                            }
+                                                          })
+                                                        : _c("v-switch", {
+                                                            attrs: {
+                                                              disabled:
+                                                                Number(
+                                                                  product.status
+                                                                ) !== 0
+                                                            },
+                                                            model: {
+                                                              value:
+                                                                product.status,
+                                                              callback: function(
+                                                                $$v
+                                                              ) {
+                                                                _vm.$set(
+                                                                  product,
+                                                                  "status",
+                                                                  $$v
+                                                                )
+                                                              },
+                                                              expression:
+                                                                "product.status"
+                                                            }
+                                                          })
+                                                    ],
+                                                    1
+                                                  ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "td",
+                                                [
+                                                  _c(
+                                                    "v-chip",
+                                                    {
+                                                      attrs: {
+                                                        color:
+                                                          _vm.status[
+                                                            Number(
+                                                              product.status
+                                                            )
+                                                          ].color,
+                                                        dark: ""
+                                                      }
+                                                    },
+                                                    [
+                                                      _vm._v(
+                                                        _vm._s(
+                                                          _vm.status[
+                                                            Number(
+                                                              product.status
+                                                            )
+                                                          ].text
+                                                        )
+                                                      )
+                                                    ]
+                                                  )
+                                                ],
+                                                1
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "td",
+                                                { staticClass: "actions" },
+                                                [
+                                                  _c(
+                                                    "v-btn",
+                                                    {
+                                                      staticClass: "ma-2",
+                                                      attrs: {
+                                                        circle: "",
+                                                        large: "",
+                                                        color:
+                                                          _vm.status[
+                                                            Number(
+                                                              product.status
+                                                            )
+                                                          ].color,
+                                                        icon: ""
+                                                      }
+                                                    },
+                                                    [
+                                                      _c(
+                                                        "v-icon",
+                                                        {
+                                                          on: {
+                                                            click: function(
+                                                              $event
+                                                            ) {
+                                                              return _vm.edit(
+                                                                product.id
+                                                              )
+                                                            }
+                                                          }
+                                                        },
+                                                        [
+                                                          _vm._v(
+                                                            "mdi-circle-edit-outline"
+                                                          )
+                                                        ]
+                                                      )
+                                                    ],
+                                                    1
+                                                  ),
                                                   _vm._v(" "),
-                                                  _c("v-radio", {
-                                                    attrs: {
-                                                      label: "Reprovar",
-                                                      value: "3"
-                                                    }
-                                                  })
+                                                  _c(
+                                                    "v-btn",
+                                                    {
+                                                      staticClass: "ma-2",
+                                                      attrs: {
+                                                        circle: "",
+                                                        large: "",
+                                                        color:
+                                                          _vm.status[
+                                                            Number(
+                                                              product.status
+                                                            )
+                                                          ].color,
+                                                        icon: ""
+                                                      }
+                                                    },
+                                                    [
+                                                      _c(
+                                                        "v-icon",
+                                                        {
+                                                          staticClass: "delete",
+                                                          on: {
+                                                            click: function(
+                                                              $event
+                                                            ) {
+                                                              return _vm.remove(
+                                                                product.id
+                                                              )
+                                                            }
+                                                          }
+                                                        },
+                                                        [
+                                                          _vm._v(
+                                                            "mdi-delete-circle"
+                                                          )
+                                                        ]
+                                                      )
+                                                    ],
+                                                    1
+                                                  )
                                                 ],
                                                 1
                                               )
-                                            ],
-                                            1
-                                          )
-                                        : _c(
-                                            "td",
-                                            [
-                                              Number(product.status) === 0
-                                                ? _c("v-switch", {
-                                                    attrs: { value: "0" },
-                                                    on: {
-                                                      change: function($event) {
-                                                        return _vm.productStatus(
-                                                          product
-                                                        )
-                                                      }
-                                                    }
-                                                  })
-                                                : _c("v-switch", {
-                                                    attrs: {
-                                                      disabled:
-                                                        Number(
-                                                          product.status
-                                                        ) !== 0
-                                                    },
-                                                    model: {
-                                                      value: product.status,
-                                                      callback: function($$v) {
-                                                        _vm.$set(
-                                                          product,
-                                                          "status",
-                                                          $$v
-                                                        )
-                                                      },
-                                                      expression:
-                                                        "product.status"
-                                                    }
-                                                  })
-                                            ],
-                                            1
-                                          ),
-                                      _vm._v(" "),
-                                      _c(
-                                        "td",
-                                        [
-                                          _c(
-                                            "v-chip",
-                                            {
-                                              attrs: {
-                                                color:
-                                                  _vm.status[
-                                                    Number(product.status)
-                                                  ].color,
-                                                dark: ""
-                                              }
-                                            },
-                                            [
-                                              _vm._v(
-                                                _vm._s(
-                                                  _vm.status[
-                                                    Number(product.status)
-                                                  ].text
-                                                )
-                                              )
-                                            ]
-                                          )
-                                        ],
-                                        1
-                                      ),
-                                      _vm._v(" "),
-                                      _c(
-                                        "td",
-                                        { staticClass: "actions" },
-                                        [
-                                          _c(
-                                            "span",
-                                            { staticClass: "edit" },
-                                            [
-                                              _c(
-                                                "v-icon",
-                                                {
-                                                  on: {
-                                                    click: function($event) {
-                                                      return _vm.edit(
-                                                        product.id
-                                                      )
-                                                    }
-                                                  }
-                                                },
-                                                [
-                                                  _vm._v(
-                                                    "mdi-circle-edit-outline"
-                                                  )
-                                                ]
-                                              )
-                                            ],
-                                            1
-                                          ),
-                                          _vm._v(" "),
-                                          _c(
-                                            "v-icon",
-                                            {
-                                              staticClass: "delete",
-                                              on: {
-                                                click: function($event) {
-                                                  return _vm.remove(product.id)
-                                                }
-                                              }
-                                            },
-                                            [_vm._v("mdi-delete-circle")]
-                                          )
-                                        ],
-                                        1
+                                            ])
+                                          }
+                                        ),
+                                        0
                                       )
-                                    ])
-                                  }),
-                                  0
-                                )
-                              ]
-                            },
-                            proxy: true
-                          }
-                        ])
-                      })
+                                    ]
+                                  },
+                                  proxy: true
+                                }
+                              ],
+                              null,
+                              false,
+                              2406296706
+                            )
+                          })
+                        : _c("p", { staticClass: "text-center" }, [
+                            _vm._v("Não há resultados para sua Pesquisa")
+                          ])
                     ],
                     1
                   )
@@ -43632,13 +43894,14 @@ var render = function() {
         { staticClass: "text-center" },
         [
           _c("v-pagination", {
-            attrs: { length: 10, "total-visible": 7 },
+            attrs: { length: _vm.browser.lastPage, "total-visible": 8 },
+            on: { input: _vm.next },
             model: {
-              value: _vm.page,
+              value: _vm.browser.page,
               callback: function($$v) {
-                _vm.page = $$v
+                _vm.$set(_vm.browser, "page", $$v)
               },
-              expression: "page"
+              expression: "browser.page"
             }
           })
         ],
@@ -103288,6 +103551,7 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_4__["default"].Store({
       state.auth.token = token;
     },
     SET_USER: function SET_USER(state, user) {
+      if (user) user.admin = Number(user.admin) ? true : false;
       state.auth.user = user;
     }
   },

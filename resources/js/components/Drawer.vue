@@ -7,11 +7,11 @@
             <v-list-item two-line>
 
               <v-list-item-avatar>
-                <img src="https://randomuser.me/api/portraits/women/82.jpg">
+                <img :src="avatar">
               </v-list-item-avatar>
 
               <v-list-item-content>
-                <v-list-item-title>{{user.name}}</v-list-item-title>
+                <v-list-item-title>Olá, {{user.name}}!</v-list-item-title>
                 <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
               </v-list-item-content>
 
@@ -48,19 +48,30 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
     data () {
         return {
-            menu: [
-                {
-                    title: 'Home',
-                    icon: 'mdi-home-city',
-                    navigate: () => this.$router.push({ path: '/products' })
-                },
-                {
-                    title: 'Novo Produto',
-                    icon: 'mdi-folder-plus',
-                    navigate: () => this.$router.push({ path: '/products/form' })
-                }
-            ],
+          avatar: `https://randomuser.me/api/portraits/women/${Math.round(Math.random() * 100)}.jpg`,
+          menu: [],
         }
+    },
+    beforeMount() {
+
+      if(this.authenticated) this.$router.push({ path: '/products' });
+
+      // menu build
+      [
+        {
+          title: 'Home',
+          icon: 'mdi-home-city',
+          navigate: () => this.$router.push({ path: '/products' }),
+          show: true
+        },
+        {
+          title: 'Novo Produto',
+          icon: 'mdi-folder-plus',
+          navigate: () => this.$router.push({ path: '/products/form' }),
+          show: !this.user.admin
+        }
+      ].forEach(item => { if(item.show) this.menu.push(item) });
+
     },
     computed: {
         ...mapGetters({

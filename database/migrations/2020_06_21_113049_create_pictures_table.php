@@ -18,7 +18,8 @@ class CreatePicturesTable extends Migration
             $table->string('title');
             $table->foreignId('product_id');
             $table->softDeletes();
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
         });
     }
 

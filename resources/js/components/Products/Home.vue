@@ -5,31 +5,34 @@
       <v-col sm="10" offset-sm="1">
 
         <v-text-field v-model="search"
-          :counter="50"
+          :counter='100'
           label='Digite para Pesquisar'
           prepend-inner-icon='mdi-magnify'
           solo
           required
+          @input="serverProductSearch"
         ></v-text-field>
 
         <!--card tabela de produtos -->
         <v-card>
           <v-card-text>
-            <v-simple-table>
+            <v-simple-table v-if="browserProductFiltered.length">
               <template v-slot:default>
                 <thead>
                   <tr>
                     <th>Imagem</th>
                     <th>Produto</th>
                     <th>Avaliação</th>
-                    <th>Status - Atual</th>
-                    <th>Ações</th>
+                    <th>Status</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="product in filteredList">
+                  <tr v-for="product in browserProductFiltered">
                     <td>
-                      <v-icon :color="product.pictures.length ? 'blue-grey darken-2' : 'pink accent-3'">{{product.pictures.length > 0 ? 'mdi-image' : 'mdi-image-off'}}</v-icon>
+                      <v-btn class="ma-2" tile large :color="status[Number(product.status)].color" icon>
+                        <v-icon :color="product.pictures.length ? 'blue-grey darken-2' : 'blue-grey lighten-4'">{{product.pictures.length > 0 ? 'mdi-image' : 'mdi-image-off'}}</v-icon>
+                      </v-btn>
                     </td>
                     <td>
                       {{product.name}}
@@ -49,17 +52,19 @@
                     <td>
                       <v-chip :color="status[Number(product.status)].color" dark>{{status[Number(product.status)].text}}</v-chip>
                     </td>
-                    <!-- if admin -->
                     <td class="actions">
-                      <span class="edit">
-                      <v-icon @click="edit(product.id)">mdi-circle-edit-outline</v-icon>
-                    </span>
-                      <v-icon @click="remove(product.id)" class="delete">mdi-delete-circle</v-icon>
+                      <v-btn class="ma-2" circle large :color="status[Number(product.status)].color" icon>
+                        <v-icon @click="edit(product.id)">mdi-circle-edit-outline</v-icon>
+                      </v-btn>
+                      <v-btn class="ma-2" circle large :color="status[Number(product.status)].color" icon>
+                        <v-icon @click="remove(product.id)" class="delete">mdi-delete-circle</v-icon>
+                      </v-btn>
                     </td>
                   </tr>
                 </tbody>
               </template>
             </v-simple-table>
+            <p v-else class="text-center">Não há resultados para sua Pesquisa</p>
           </v-card-text>
         </v-card>
         <!--card tabela de produtos -->
@@ -69,9 +74,10 @@
     <!-- paginacao -->
     <div class="text-center">
       <v-pagination
-        v-model="page"
-        :length="10"
-        :total-visible="7"
+        v-model="browser.page"
+        :length="browser.lastPage"
+        :total-visible="8"
+        @input="next"
       ></v-pagination>
     </div>
     <!-- paginacao -->
@@ -98,9 +104,36 @@
               payload: {}
             },
             search: '',
-            products: [],
-            page: 1,
-            itemsPerPage: 8,
+            timer: null,
+            filteredProductList: [],
+            products: [
+              {name:'aguarde...',status:1,pictures:[]},
+              {name:'aguarde...',status:1,pictures:[]},
+              {name:'aguarde...',status:1,pictures:[]},
+              {name:'aguarde...',status:1,pictures:[]},
+              {name:'aguarde...',status:1,pictures:[]},
+              {name:'aguarde...',status:1,pictures:[]},
+              {name:'aguarde...',status:1,pictures:[]},
+              {name:'aguarde...',status:1,pictures:[]},
+              {name:'aguarde...',status:1,pictures:[]},
+              {name:'aguarde...',status:1,pictures:[]},
+            ],
+            browser: {
+              page: 1,
+              itemsPerPage: 10,
+              lastPage: 1,
+            },
+            server: {
+              page: 1,
+              lastPage: 1,
+              perPage: 1,
+              total: 1,
+              from: 1,
+              to: 1,
+              firstPageUrl: '',
+              lastPageUrl: '',
+              nextPageUrl: ''
+            }
         }
     },
     mounted() {
@@ -111,15 +144,87 @@
           authenticated: 'authenticated',
           user: 'user',
       }),
-      filteredList()
-      {
-        return (this.search.length < 1) ? this.products : this.products.filter(item => item.name.indexOf(this.search) > -1);
+      browserProductFiltered: {
+        get()
+        {
+          let pagePiece = this.browser.page * this.browser.itemsPerPage; 
+          let userSearched = this.search.length > 0;
+          let searchEmpty = this.products.slice(pagePiece - this.browser.itemsPerPage, pagePiece);
+
+          if(userSearched) return this.filteredProductList;
+
+          return searchEmpty;
+        },
+        set(value)
+        {
+          this.filteredProductList = value;
+        }
+      },
+      browserLastPage() {
+        return Math.ceil(this.products.length / this.browser.itemsPerPage);
       }
     },
     methods: {
+      loading() {
+        this.filteredProductList = [
+          {name:'aguarde...',status:1,pictures:[]},
+          {name:'aguarde...',status:1,pictures:[]},
+          {name:'aguarde...',status:1,pictures:[]},
+          {name:'aguarde...',status:1,pictures:[]},
+          {name:'aguarde...',status:1,pictures:[]},
+          {name:'aguarde...',status:1,pictures:[]},
+          {name:'aguarde...',status:1,pictures:[]},
+          {name:'aguarde...',status:1,pictures:[]},
+          {name:'aguarde...',status:1,pictures:[]},
+          {name:'aguarde...',status:1,pictures:[]},
+        ];
+      },
+      serverProductSearch() {
+        clearTimeout(this.timer);
+        this.loading();
+
+        this.timer = setTimeout(() => {
+
+          this.filteredProductList = this.products.filter(item => item.name.indexOf(this.search) > -1);
+
+          let exception = this.filteredProductList.map(item => item.id).filter(id => typeof id !== "undefined");
+          let encodedParams = [
+            `search=${encodeURIComponent(this.search)}`,
+            `except=${encodeURIComponent(exception)}`
+          ].join('&');
+
+          axios.get(`/api/v1/products?${encodedParams}`).then(response => {
+
+              this.products = this.products.concat(response.data.data).sort((a,b) => (a.id < b.id) ? -1 : 1);
+
+              // setting browser pagination configuration with a computed property
+              this.browser.lastPage = this.filteredProductList.length;
+
+              console.log('requesting more pages...');
+          }).catch(error => {
+              console.error(error);
+          });          
+
+        }, 1000);
+      },
       show() {
-          axios.get('api/v1/products').then(response => {
+          axios.get('/api/v1/products').then(response => {
               this.products = response.data.data;
+
+              // setting server pagination configuration
+              this.server.page = response.data.current_page;
+              this.server.lastPage = response.data.last_page;
+              this.server.perPage = response.data.per_page;
+              this.server.total = response.data.total;
+              this.server.from = response.data.from;
+              this.server.to = response.data.to;
+              this.server.firstPageUrl = response.data.first_page_url;
+              this.server.lastPageUrl = response.data.last_page_url;
+              this.server.nextPageUrl = response.data.nex_page_url;
+
+              // setting browser pagination configuration with a computed property
+              this.browser.lastPage = this.browserLastPage;
+
               console.warn(response);
           }).catch(error => {
               console.error(error);
@@ -129,12 +234,28 @@
           this.$router.push({name: 'products.edit', params: { id: id }});
       },
       remove(id) {
-          axios.delete(`api/v1/products/${id}`).then(response => {
+          axios.delete(`/api/v1/products/${id}`).then(response => {
               console.log(response.data);
               this.show();
           }).catch(error => {
               console.error(error);
           });
+      },
+      next() {
+
+        if(this.browser.page === this.browser.lastPage - 1)
+        {
+          axios.get(`/api/v1/products?page=${++this.server.page}`).then(response => {
+              this.products = this.products.concat(response.data.data);
+              // setting browser pagination configuration
+              this.browser.lastPage = this.browserLastPage;
+
+              console.log('requesting more pages...');
+          }).catch(error => {
+              console.error(error);
+          });
+        }
+
       },
       productStatus(payload) {
 

@@ -29,21 +29,27 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $loop = 0;
+        $loopid = 1;
 
-        while($loop++ < 25)
+        $start = microtime(TRUE);
+
+        DB::insert('PRAGMA synchronous = OFF');
+        DB::insert('PRAGMA temp_store = MEMORY');
+        DB::insert('PRAGMA journal_mode = MEMORY');
+
+        DB::beginTransaction();
+
+        while($loop++ < 10000)
         {
-            $id = Product::updateOrCreate([
-                'name' => 'Produto 0' . $loop,
-                'status' => 0
-                /*
-                'description' => 'Descrição do Produto 02',
-                'price' => 19.99,
-                'status' => 1,
-                'category' => 1
-                */
-            ])->id;
+            DB::insert('insert into products(name, status) values(?,?)',['Produto ' . $loop, 0]);
+            DB::insert('insert into pictures(title, product_id) values(?,?)',[md5(uniqid(rand(), true)) . '.png', $loopid]);
 
-            Picture::create(['title' => time() . '.png', 'product_id' => $id]);
+            $loopid++;          
         }
+
+        DB::commit();
+
+        $end = microtime(TRUE);
+        echo "Termino do processo de seed em " . ($end - $start) . " segundos.";
     }
 }

@@ -31,7 +31,7 @@
 
                 <form>
                   <v-text-field v-model="product.name"
-                    :counter="10"
+                    :counter="150"
                     label="Nome do Produto"
                     required
                   ></v-text-field>
@@ -105,16 +105,13 @@
 
                     let payload = new FormData();
 
-                    payload.append('_method', 'PUT');
+                    let method = this.product.id ? 'put' : 'post';
+
+                    payload.append('_method', method);
                     payload.append('image', blob);
                     payload.append('name', this.product.name);
-                    /*
-                    payload.append('price', this.price);
-                    payload.append('category', this.product.category);
-                    payload.append('info', this.product.info);
-                    */
 
-                    axios[this.form.method](this.form.endpoint, payload, {
+                    axios[method](this.form.endpoint, payload, {
                         headers: {
                             'content-type': 'multipart/form-data'
                         }

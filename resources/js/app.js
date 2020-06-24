@@ -83,6 +83,8 @@ const store = new Vuex.Store({
 
     SET_USER(state, user)
     {
+      if(user) user.admin = Number(user.admin) ? true : false;
+
       state.auth.user = user;
     }
 

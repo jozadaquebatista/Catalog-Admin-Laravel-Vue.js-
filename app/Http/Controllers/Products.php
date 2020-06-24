@@ -18,12 +18,16 @@ class Products extends Controller
     private $productInfo;
     private $pictureInfo;
     private $hasPermission;
+    private $isAdmin;
 
     public function __construct(Request $request)
     {
-        // verify if client authentication
+        // verify client authentication
         try {
             auth()->userOrFail();
+
+            $this->isAdmin = intval(auth()->user()->admin);
+
             $this->hasPermission = true;
         } catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
             $this->hasPermission = false;
@@ -31,7 +35,7 @@ class Products extends Controller
                 'status' => 401,
                 'message' => 'Unauthenticated.'
             ];
-        } 
+        }
 
         if($this->hasPermission)
         {
@@ -55,15 +59,21 @@ class Products extends Controller
     {
         if($this->hasPermission)
         {
-            if($this->paginate)
-            {
-                $this->response['data'] = Product::paginate(8);
-            } else {
-                $this->response['data'] = Product::with('pictures')->get();
-            }
-        }        
+            $allowedStatus = $this->isAdmin ? [1,2,3] : [0,1,2,3];
 
-        return response($this->response, $this->response['status']);
+            if($this->request->has('search') && $this->request->has('except'))
+            {
+                $search = $this->request->all()['search'];
+                $exceptions = explode(',', $this->request->all()['except']);
+
+                $this->response['data'] = Product::with('pictures')->whereNotIn('id', $exceptions)
+                                    ->whereIn('status', $allowedStatus)->where('name', 'like', '%' . $search . '%')->get();
+            } else {
+                $this->response = Product::with('pictures')->whereIn('status', $allowedStatus)->paginate(50);
+            }
+        }
+
+        return response($this->response, 200);
     }
 
     public function show($id)

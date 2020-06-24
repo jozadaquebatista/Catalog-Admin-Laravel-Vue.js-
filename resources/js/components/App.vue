@@ -28,7 +28,5 @@
 </script>
 
 <style>
-  * {
-    user-select: none;
-  }
+  * { user-select: none; }
 </style>
