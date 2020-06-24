@@ -38,7 +38,7 @@ Para compilar os componentes, basta executar o comando abaixo em algum terminal:
 ### Login
 <kbd>
     
-![Login Screen](https://i.imgur.com/l7X43LM.png)
+![Login Screen](https://raw.githubusercontent.com/jozadaquebatista/Catalog-Admin-Laravel-Vue.js-/master/cover/screen1.PNG)
 
 </kbd>
 ---------
@@ -46,7 +46,7 @@ Para compilar os componentes, basta executar o comando abaixo em algum terminal:
 ### Tela inicial
 <kbd>
 
-![Login Screen](https://i.imgur.com/KiqBpO9.png)
+![Listagem dos Produtos](https://raw.githubusercontent.com/jozadaquebatista/Catalog-Admin-Laravel-Vue.js-/master/cover/screen2.PNG)
 
 </kbd>
 ---------
@@ -54,6 +54,6 @@ Para compilar os componentes, basta executar o comando abaixo em algum terminal:
 ### Cadastro de Produto
 <kbd>
 
-![Login Screen](https://i.imgur.com/mDcaWzT.png)
+![Cadastro de Produto](https://raw.githubusercontent.com/jozadaquebatista/Catalog-Admin-Laravel-Vue.js-/master/cover/screen3.PNG)
 
 </kbd>
